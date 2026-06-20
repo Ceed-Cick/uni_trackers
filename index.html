@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniTracker Pro — Lectures, Exams & Labs</title>
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --primary-dark: #3730a3;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1),0 4px 10px rgba(0,0,0,0.08);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+        .header{background:linear-gradient(135deg,#312e81 0%,#4f46e5 40%,#6366f1 100%);color:#fff;padding:16px 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(79,70,229,0.3);}
+        .header-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+        .logo{display:flex;align-items:center;gap:10px;font-size:1.5rem;font-weight:700;}
+        .logo-icon{width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+        .header-date{font-size:0.9rem;opacity:0.9;background:rgba(255,255,255,0.15);padding:8px 16px;border-radius:20px;font-weight:500;}
+        .header-actions{display:flex;gap:8px;}
+        .btn-sm{padding:6px 14px;font-size:0.8rem;border-radius:20px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;gap:6px;}
+        .btn-outline-light{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5);}
+        .btn-outline-light:hover{background:rgba(255,255,255,0.1);}
+        .container{max-width:1200px;margin:0 auto;padding:20px 24px;}
+        .tab-nav{display:flex;gap:4px;background:var(--surface);border-radius:var(--radius-lg);padding:5px;margin-bottom:24px;box-shadow:var(--shadow-sm);border:1px solid var(--border);overflow-x:auto;}
+        .tab-btn{flex:1;min-width:100px;padding:12px 18px;border:none;background:transparent;border-radius:var(--radius);cursor:pointer;font-size:0.95rem;font-weight:500;color:var(--text-secondary);transition:var(--transition);white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:8px;}
+        .tab-btn:hover{color:var(--text);background:var(--surface-alt);}
+        .tab-btn.active{background:var(--primary);color:#fff;box-shadow:var(--shadow-md);}
+        .tab-badge{background:rgba(255,255,255,0.3);color:inherit;font-size:0.75rem;padding:3px 9px;border-radius:12px;font-weight:600;}
+        .tab-btn.active .tab-badge{background:rgba(255,255,255,0.3);}
+        .tab-btn:not(.active) .tab-badge{background:#e2e8f0;color:var(--text-secondary);}
+        .view-panel{display:none;animation:fadeSlideIn 0.35s ease;}
+        .view-panel.active{display:block;}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+        .card{background:var(--surface);border-radius:var(--radius-lg);padding:20px 24px;box-shadow:var(--shadow);border:1px solid var(--border);}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+        .card-title{font-weight:700;font-size:1.1rem;}
+        .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
+        .stat-card{background:var(--surface);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:12px;transition:var(--transition);}
+        .stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+        .stat-icon{width:42px;height:42px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+        .stat-icon.blue{background:#eff6ff;color:#3b82f6;}
+        .stat-icon.indigo{background:#eef2ff;color:#4f46e5;}
+        .stat-icon.red{background:#fef2f2;color:#ef4444;}
+        .stat-icon.green{background:#ecfdf5;color:#10b981;}
+        .stat-info .stat-value{font-size:1.5rem;font-weight:700;line-height:1;}
+        .stat-info .stat-label{font-size:0.8rem;color:var(--text-secondary);font-weight:500;}
+
+        .streak-box{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,#fef3c7,#fff7ed);border-radius:var(--radius);font-weight:600;}
+        .streak-fire{font-size:2rem;}
+        .month-calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:0.75rem;margin-top:10px;}
+        .cal-day{padding:6px 2px;border-radius:4px;background:var(--surface-alt);cursor:default;}
+        .cal-day.today{border:2px solid var(--primary);}
+        .cal-day.has-activity{background:#dbeafe;font-weight:600;}
+        .cal-day.empty{color:transparent;}
+        .day-label{font-weight:600;color:var(--text-secondary);font-size:0.7rem;}
+
+        .search-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;}
+        .search-bar input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:24px;font-family:var(--font);background:var(--surface);}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:25px;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;transition:var(--transition);font-family:var(--font);}
+        .btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,0.3);}
+        .btn-primary:hover{background:var(--primary-dark);}
+
+        .entry-list{display:flex;flex-direction:column;gap:8px;}
+        .entry-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-alt);border-radius:var(--radius);transition:var(--transition);border:1px solid transparent;flex-wrap:wrap;}
+        .entry-item:hover{border-color:var(--border);box-shadow:var(--shadow-sm);}
+        .entry-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+        .entry-info{flex:1;min-width:150px;}
+        .entry-title{font-weight:600;font-size:0.9rem;}
+        .entry-meta{font-size:0.8rem;color:var(--text-secondary);}
+        .badge{display:inline-block;padding:4px 10px;border-radius:14px;font-size:0.75rem;font-weight:600;}
+        .badge-high{background:#fef2f2;color:#ef4444;}
+        .badge-medium{background:#fffbeb;color:#d97706;}
+        .badge-low{background:#eff6ff;color:#3b82f6;}
+        .badge-countdown{padding:5px 12px;border-radius:16px;font-weight:700;font-size:0.8rem;}
+        .badge-countdown.urgent{background:#fef2f2;color:#dc2626;}
+        .badge-countdown.soon{background:#fffbeb;color:#d97706;}
+        .badge-countdown.comfortable{background:#ecfdf5;color:#059669;}
+
+        .subject-chart{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+        .chart-bar{display:flex;align-items:center;gap:6px;background:#f1f5f9;border-radius:20px;padding:4px 12px;font-size:0.8rem;}
+
+        .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+        .modal{background:var(--surface);border-radius:var(--radius-xl);padding:28px;width:100%;max-width:520px;box-shadow:var(--shadow-lg);}
+        .modal h3{font-size:1.3rem;margin-bottom:16px;}
+        .form-group{margin-bottom:14px;}
+        .form-group label{font-weight:600;font-size:0.85rem;color:var(--text-secondary);display:block;margin-bottom:4px;}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);background:var(--surface-alt);}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+        .btn-cancel{background:#f1f5f9;color:var(--text-secondary);border:none;padding:10px 20px;border-radius:25px;cursor:pointer;font-weight:600;}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;}
+        .toast{background:#1e293b;color:#fff;padding:12px 20px;border-radius:25px;animation:toastIn 0.3s ease,toastOut 0.3s 2.5s forwards;}
+        @keyframes toastIn{from{opacity:0;transform:translateX(60px);}to{opacity:1;transform:translateX(0);}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(60px);}}
+        @media(max-width:768px){.stat-row{grid-template-columns:repeat(2,1fr);}.form-row{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <div class="logo"><div class="logo-icon">📚</div><span>UniTracker Pro</span></div>
+        <div class="header-date" id="headerDate"></div>
+        <div class="header-actions">
+            <button class="btn-sm btn-outline-light" onclick="App.exportData()">📤 Export</button>
+            <button class="btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">📥 Import</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="App.importData(this)">
+        </div>
+    </div>
+</header>
+<div class="container">
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="dashboard">🏠 Dashboard</button>
+        <button class="tab-btn" data-tab="topics">📝 Topics <span class="tab-badge" id="topicsCount">0</span></button>
+        <button class="tab-btn" data-tab="exams">📅 Exams <span class="tab-badge" id="examsCount">0</span></button>
+        <button class="tab-btn" data-tab="labs">🔬 Labs <span class="tab-badge" id="labsCount">0</span></button>
+    </nav>
+    <div class="view-panel active" id="panel-dashboard"></div>
+    <div class="view-panel" id="panel-topics"></div>
+    <div class="view-panel" id="panel-exams"></div>
+    <div class="view-panel" id="panel-labs"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none;"><div class="modal" id="modalContent"></div></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function() {
+    const STORAGE_KEY = 'unitracker_pro_v2';
+    const App = {
+        data: { topics:[], exams:[], labs:[] },
+        editingId: null, editingType: null, currentTab:'dashboard', searchQuery:'',
+
+        init(){
+            this.loadData();
+            this.updateHeaderDate();
+            this.bindTabs();
+            this.bindModalClose();
+            this.renderAll();
+            setInterval(()=> this.renderAll(), 60000);
+        },
+        loadData(){
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if(raw){
+                try{ this.data = JSON.parse(raw); }catch(e){ this.seed(); }
+            }else{ this.seed(); }
+        },
+        seed(){
+            const today = this.todayStr();
+            const yest = this.dateOffset(-1);
+            const d2 = this.dateOffset(2), d3 = this.dateOffset(3), d5 = this.dateOffset(5);
+            this.data.topics = [
+                {id:this.genId(),date:today,subject:'Machine Learning',topic:'Backpropagation & Optimization',notes:'',createdAt:Date.now()},
+                {id:this.genId(),date:yest,subject:'Data Structures',topic:'Red-Black Trees',notes:'',createdAt:Date.now()-864e5},
+                {id:this.genId(),date:yest,subject:'Software Engineering',topic:'Design Patterns',notes:'',createdAt:Date.now()-864e5}
+            ];
+            this.data.exams = [
+                {id:this.genId(),subject:'Machine Learning',examName:'Midterm',date:d3,time:'10:00',location:'Hall A',priority:'high',notes:'',createdAt:Date.now()},
+                {id:this.genId(),subject:'Data Structures',examName:'Quiz',date:d5,time:'14:30',location:'Room 204',priority:'medium',notes:'',createdAt:Date.now()}
+            ];
+            this.data.labs = [
+                {id:this.genId(),subject:'Machine Learning',labName:'NN Implementation',date:d2,time:'13:00',location:'CS Lab',status:'upcoming',notes:'',createdAt:Date.now()}
+            ];
+            this.save();
+        },
+        save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data)); },
+        genId(){ return 'id_'+Date.now()+'_'+Math.random().toString(36).substr(2,6); },
+        todayStr(){ return new Date().toISOString().split('T')[0]; },
+        dateOffset(d){ const dt=new Date(); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; },
+        formatDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); },
+        daysUntil(d){ const t=new Date(d+'T00:00:00'); const n=new Date(); n.setHours(0,0,0,0); return Math.round((t-n)/86400000); },
+        showToast(m){ const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className='toast'; t.textContent=m; c.appendChild(t); setTimeout(()=>t.remove(),3000); },
+
+        // Export / Import
+        exportData(){
+            const blob = new Blob([JSON.stringify(this.data,null,2)],{type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href=url; a.download='unitracker_backup.json'; a.click();
+            this.showToast('📤 Data exported!');
+        },
+        importData(input){
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e)=>{
+                try{
+                    const json = JSON.parse(e.target.result);
+                    if(json.topics && json.exams && json.labs){
+                        this.data = json;
+                        this.save();
+                        this.renderAll();
+                        this.showToast('📥 Data imported successfully!');
+                    }else{ throw new Error('Invalid format'); }
+                }catch(err){ this.showToast('❌ Invalid file format.'); }
+            };
+            reader.readAsText(file);
+            input.value='';
+        },
+
+        bindTabs(){
+            document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>this.switchTab(b.dataset.tab)));
+        },
+        switchTab(tab){
+            this.currentTab=tab;
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+            document.getElementById(`panel-${tab}`).classList.add('active');
+            this.renderView();
+        },
+        renderAll(){ this.updateBadges(); this.renderView(); },
+        renderView(){
+            switch(this.currentTab){
+                case 'dashboard': this.renderDashboard(); break;
+                case 'topics': this.renderTopics(); break;
+                case 'exams': this.renderExams(); break;
+                case 'labs': this.renderLabs(); break;
+            }
+        },
+        updateBadges(){
+            document.getElementById('topicsCount').textContent=this.data.topics.length;
+            document.getElementById('examsCount').textContent=this.data.exams.length;
+            document.getElementById('labsCount').textContent=this.data.labs.length;
+        },
+        updateHeaderDate(){
+            document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+        },
+
+        // ── Dashboard ──
+        renderDashboard(){
+            const today = this.todayStr();
+            const todayTopics = this.data.topics.filter(t=>t.date===today).length;
+            const upcomingExams = this.data.exams.filter(e=>this.daysUntil(e.date)>=0).length;
+            const upcomingLabs = this.data.labs.filter(l=>l.status==='upcoming' && this.daysUntil(l.date)>=0).length;
+            const streak = this.calcStreak();
+            const subjects = [...new Set(this.data.topics.map(t=>t.subject))];
+            const subjectCounts = subjects.map(s=>({sub:s, count:this.data.topics.filter(t=>t.subject===s).length})).sort((a,b)=>b.count-a.count);
+
+            const html = `
+            <div class="stat-row">
+                <div class="stat-card"><div class="stat-icon indigo">📝</div><div class="stat-info"><div class="stat-value">${todayTopics}</div><div class="stat-label">Today's Topics</div></div></div>
+                <div class="stat-card"><div class="stat-icon blue">📚</div><div class="stat-info"><div class="stat-value">${this.data.topics.length}</div><div class="stat-label">Total Topics</div></div></div>
+                <div class="stat-card"><div class="stat-icon red">📅</div><div class="stat-info"><div class="stat-value">${upcomingExams}</div><div class="stat-label">Upcoming Exams</div></div></div>
+                <div class="stat-card"><div class="stat-icon green">🔬</div><div class="stat-info"><div class="stat-value">${upcomingLabs}</div><div class="stat-label">Upcoming Labs</div></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div class="card">
+                    <div class="card-title">🔥 Study Streak</div>
+                    <div class="streak-box">
+                        <span class="streak-fire">${streak>0?'🔥':'❄️'}</span>
+                        <div><strong>${streak} day${streak!==1?'s':''}</strong> ${streak>0?'keep going!':'log a topic today to start'}</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 Subject Breakdown</div>
+                    <div class="subject-chart">${subjectCounts.map(s=>`<div class="chart-bar">📘 ${this.escHtml(s.sub)} <strong>${s.count}</strong></div>`).join('') || '<span style="color:var(--text-muted)">No topics yet</span>'}</div>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+                <div class="card-title">🗓️ Monthly Activity</div>
+                <div id="monthCal"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">📝 Today's Topics</span><button class="btn btn-primary btn-sm" onclick="App.openTopicModal()">+ Add</button></div>
+                    <div id="dashToday"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⏳ Urgent Exams (next 7d)</div>
+                    <div id="urgentExams"></div>
+                </div>
+            </div>`;
+            document.getElementById('panel-dashboard').innerHTML = html;
+            this.renderMonthCalendar();
+            this.fillDashToday();
+            this.fillUrgentExams();
+        },
+        calcStreak(){
+            const dates = [...new Set(this.data.topics.map(t=>t.date))].sort().reverse();
+            let streak=0;
+            const check = new Date(this.todayStr()+'T00:00:00');
+            for(let i=0;i<365;i++){
+                const d = check.toISOString().split('T')[0];
+                if(dates.includes(d)){ streak++; check.setDate(check.getDate()-1); }
+                else break;
+            }
+            return streak;
+        },
+        renderMonthCalendar(){
+            const now = new Date();
+            const year = now.getFullYear(), month = now.getMonth();
+            const firstDay = new Date(year,month,1).getDay();
+            const daysInMonth = new Date(year,month+1,0).getDate();
+            const activeDates = new Set(this.data.topics.map(t=>t.date));
+            let html = '<div class="month-calendar">';
+            ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>html+=`<div class="day-label">${d}</div>`);
+            for(let i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
+            for(let d=1;d<=daysInMonth;d++){
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const cls = (activeDates.has(dateStr)?'has-activity':'') + (dateStr===this.todayStr()?' today':'');
+                html+=`<div class="cal-day ${cls}">${d}</div>`;
+            }
+            html+='</div>';
+            document.getElementById('monthCal').innerHTML = html;
+        },
+        fillDashToday(){
+            const today = this.todayStr();
+            const items = this.data.topics.filter(t=>t.date===today);
+            document.getElementById('dashToday').innerHTML = items.length ? items.map(t=>this.topicEntry(t)).join('') : '<div class="empty-state">📭 No topics yet</div>';
+        },
+        fillUrgentExams(){
+            const upcoming = this.data.exams.filter(e=>{const d=this.daysUntil(e.date); return d>=0 && d<=7;}).sort((a,b)=>this.daysUntil(a.date)-this.daysUntil(b.date));
+            document.getElementById('urgentExams').innerHTML = upcoming.length ? upcoming.map(e=>this.examEntry(e,this.daysUntil(e.date))).join('') : '<div class="empty-state">✅ No urgent exams</div>';
+        },
+
+        // Topics view
+        renderTopics(){
+            const panel = document.getElementById('panel-topics');
+            const filtered = this.data.topics.filter(t=>{
+                if(!this.searchQuery) return true;
+                const q = this.searchQuery.toLowerCase();
+                return t.subject.toLowerCase().includes(q) || t.topic.toLowerCase().includes(q) || (t.notes&&t.notes.toLowerCase().includes(q));
+            }).sort((a,b)=>b.date.localeCompare(a.date));
+            panel.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                <h2>📝 Topics</h2>
+                <button class="btn btn-primary" onclick="App.openTopicModal()">+ Log Topic</button>
+            </div>
+            <div class="search-bar"><input type="text" placeholder="Search topics..." id="topicSearch" value="${this.searchQuery}" oninput="App.searchQuery=this.value;App.renderTopics()"></div>
+            <div id="topicListContainer">${filtered.length ? filtered.map(t=>this.topicEntry(t)).join('') : '<div class="empty-state">No topics match</div>'}</div>`;
+        },
+        topicEntry(t){
+            return `<div class="entry-item">
+                <div class="entry-icon" style="background:#eef2ff;color:#4f46e5;">📖</div>
+                <div class="entry-info"><div class="entry-title">${this.escHtml(t.topic)}</div><div class="entry-meta">${this.escHtml(t.subject)} · ${this.formatDate(t.date)}</div></div>
+                <button class="btn-sm" onclick="App.openTopicModal('${t.id}')">✏️</button>
+                <button class="btn-sm" style="color:#ef4444;" onclick="App.deleteTopic('${t.id}')">🗑️</button>
+            </div>`;
+        },
+
+        // Exams view
+        renderExams(){
+            const panel = document.getElementById('panel-exams');
+            const now = this.todayStr();
+            const upcoming = this.data.exams.filter(e=>e.date>=now).sort((a,b)=>a.date.localeCompare(b.date));
+            const past = this.data.exams.filter(e=>e.date<now).sort((a,b)=>b.date.localeCompare(a.date));
+            panel.innerHTML = `
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h2>📅 Exams</h2><button class="btn btn-primary" onclick="App.openExamModal()">+ Schedule</button></div>
+            ${upcoming.length ? '<h3 style="color:#10b981;margin-bottom:8px;">Upcoming</h3>'+upcoming.map(e=>this.examEntry(e,this.daysUntil(e.date))).join('') : ''}
+            ${past.length ? '<h3 style="color:#94a3b8;margin:16px 0 8px;">Past</h3>'+past.map(e=>this.examEntry(e,null,true)).join('') : ''}
+            ${this.data.exams.length===0?'<div class="empty-state">No exams scheduled</div>':''}`;
+        },
+        examEntry(e, daysLeft, isPast=false){
+            const priorityBadge = {'high':'<span class="badge badge-high">🔴 High</span>','medium':'<span class="badge badge-medium">🟡 Medium</span>','low':'<span class="badge badge-low">🔵 Low</span>'}[e.priority]||'';
+            let countdown = '';
+            if(!isPast && daysLeft!==null){
+                let cls = daysLeft===0?'urgent':daysLeft<=2?'urgent':daysLeft<=5?'soon':'comfortable';
+                countdown = `<span class="badge-countdown ${cls}">${daysLeft===0?'🚨 TODAY':daysLeft+'d left'}</span>`;
+            }
+            return `<div class="entry-item" style="${isPast?'opacity:0.7':''}">
+                <div class="entry-icon" style="background:#fef2f2;color:#ef4444;">📅</div>
+                <div class="entry-info"><div class="entry-title">${this.escHtml(e.examName)} - ${this.escHtml(e.subject)}</div><div class="entry-meta">${this.formatDate(e.date)} · ${e.time||'TBD'} · ${e.location||''}</div></div>
+                ${countdown} ${priorityBadge}
+                <button class="btn-sm" onclick="App.openExamModal('${e.id}')">✏️</button>
+                <button class="btn-sm" style="color:#ef4444;" onclick="App.deleteExam('${e.id}')">🗑️</button>
+            </div>`;
+        },
+
+        // Labs view
+        renderLabs(){
+            const panel = document.getElementById('panel-labs');
+            const labs = [...this.data.labs].sort((a,b)=>a.date.localeCompare(b.date));
+            panel.innerHTML = `
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h2>🔬 Labs</h2><button class="btn btn-primary" onclick="App.openLabModal()">+ Schedule</button></div>
+            ${labs.length ? labs.map(l=>this.labEntry(l)).join('') : '<div class="empty-state">No labs scheduled</div>'}`;
+        },
+        labEntry(l){
+            const statusBadge = {'upcoming':'<span class="badge" style="background:#eff6ff;color:#3b82f6;">🔵 Upcoming</span>','completed':'<span class="badge" style="background:#ecfdf5;color:#10b981;">🟢 Done</span>','cancelled':'<span class="badge" style="background:#f1f5f9;color:#94a3b8;">⚪ Cancelled</span>'}[l.status]||'';
+            return `<div class="entry-item" style="${l.status==='cancelled'?'opacity:0.6':''}">
+                <div class="entry-icon" style="background:#ecfdf5;color:#10b981;">🔬</div>
+                <div class="entry-info"><div class="entry-title">${this.escHtml(l.labName)} - ${this.escHtml(l.subject)}</div><div class="entry-meta">${this.formatDate(l.date)} · ${l.time||''} · ${l.location||''}</div></div>
+                ${statusBadge}
+                <button class="btn-sm" onclick="App.toggleLabStatus('${l.id}')">🔄</button>
+                <button class="btn-sm" onclick="App.openLabModal('${l.id}')">✏️</button>
+                <button class="btn-sm" style="color:#ef4444;" onclick="App.deleteLab('${l.id}')">🗑️</button>
+            </div>`;
+        },
+        toggleLabStatus(id){
+            const lab = this.data.labs.find(l=>l.id===id);
+            if(!lab) return;
+            const cycle = {upcoming:'completed',completed:'cancelled',cancelled:'upcoming'};
+            lab.status = cycle[lab.status];
+            this.save(); this.renderAll();
+            this.showToast('🔬 Status updated');
+        },
+
+        // ── Modal Logic (full implementation) ──
+        openTopicModal(editId=null){
+            this.editingType='topic'; this.editingId=editId;
+            const existing = editId ? this.data.topics.find(t=>t.id===editId) : null;
+            this.showModal(`
+            <h3>${editId?'✏️ Edit Topic':'📝 Log Lecture Topic'}</h3>
+            <div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="tfDate" value="${existing?existing.date:this.todayStr()}"></div>
+            <div class="form-group"><label>Subject</label><input type="text" id="tfSubject" placeholder="e.g. ML" value="${existing?this.escHtml(existing.subject):''}"></div></div>
+            <div class="form-group"><label>Topic</label><input type="text" id="tfTopic" placeholder="Topic covered" value="${existing?this.escHtml(existing.topic):''}"></div>
+            <div class="form-group"><label>Notes</label><textarea id="tfNotes">${existing?this.escHtml(existing.notes||''):''}</textarea></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="App.closeModal()">Cancel</button><button class="btn btn-primary" onclick="App.saveTopic()">${editId?'Update':'Save'}</button></div>
+            `);
+            setTimeout(()=>document.getElementById('tfSubject')?.focus(),100);
+        },
+        saveTopic(){
+            const date=document.getElementById('tfDate')?.value, subject=document.getElementById('tfSubject')?.value.trim(), topic=document.getElementById('tfTopic')?.value.trim(), notes=document.getElementById('tfNotes')?.value.trim();
+            if(!date||!subject||!topic){ this.showToast('⚠️ Fill date, subject, topic'); return; }
+            if(this.editingId){
+                const idx=this.data.topics.findIndex(t=>t.id===this.editingId);
+                if(idx>=0){ this.data.topics[idx]={...this.data.topics[idx],date,subject,topic,notes}; }
+            }else{ this.data.topics.push({id:this.genId(),date,subject,topic,notes,createdAt:Date.now()}); }
+            this.save(); this.closeModal(); this.renderAll(); this.showToast('✅ Topic saved');
+        },
+        deleteTopic(id){ if(confirm('Delete?')){ this.data.topics=this.data.topics.filter(t=>t.id!==id); this.save(); this.renderAll(); this.showToast('🗑️ Deleted'); } },
+
+        openExamModal(editId=null){
+            this.editingType='exam'; this.editingId=editId;
+            const existing = editId ? this.data.exams.find(e=>e.id===editId) : null;
+            this.showModal(`
+            <h3>${editId?'✏️ Edit Exam':'📅 Schedule Exam'}</h3>
+            <div class="form-row"><div class="form-group"><label>Subject</label><input type="text" id="efSubject" value="${existing?this.escHtml(existing.subject):''}"></div>
+            <div class="form-group"><label>Exam Name</label><input type="text" id="efExamName" value="${existing?this.escHtml(existing.examName):''}"></div></div>
+            <div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="efDate" value="${existing?existing.date:this.todayStr()}"></div>
+            <div class="form-group"><label>Time</label><input type="time" id="efTime" value="${existing?existing.time:'10:00'}"></div></div>
+            <div class="form-row"><div class="form-group"><label>Location</label><input type="text" id="efLocation" value="${existing?this.escHtml(existing.location||''):''}"></div>
+            <div class="form-group"><label>Priority</label><select id="efPriority"><option value="high" ${existing&&existing.priority==='high'?'selected':''}>🔴 High</option><option value="medium" ${existing&&existing.priority==='medium'?'selected':''}>🟡 Medium</option><option value="low" ${existing&&existing.priority==='low'?'selected':''}>🔵 Low</option></select></div></div>
+            <div class="form-group"><label>Notes</label><textarea id="efNotes">${existing?this.escHtml(existing.notes||''):''}</textarea></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="App.closeModal()">Cancel</button><button class="btn btn-primary" onclick="App.saveExam()">${editId?'Update':'Schedule'}</button></div>
+            `);
+        },
+        saveExam(){
+            const s=document.getElementById('efSubject')?.value.trim(), n=document.getElementById('efExamName')?.value.trim(), d=document.getElementById('efDate')?.value, t=document.getElementById('efTime')?.value, l=document.getElementById('efLocation')?.value.trim(), p=document.getElementById('efPriority')?.value, nt=document.getElementById('efNotes')?.value.trim();
+            if(!s||!n||!d){ this.showToast('⚠️ Fill required fields'); return; }
+            if(this.editingId){
+                const idx=this.data.exams.findIndex(e=>e.id===this.editingId);
+                if(idx>=0) Object.assign(this.data.exams[idx],{subject:s,examName:n,date:d,time:t,location:l,priority:p,notes:nt});
+            }else{ this.data.exams.push({id:this.genId(),subject:s,examName:n,date:d,time:t,location:l,priority:p,notes:nt,createdAt:Date.now()}); }
+            this.save(); this.closeModal(); this.renderAll(); this.showToast('✅ Exam saved');
+        },
+        deleteExam(id){ if(confirm('Delete?')){ this.data.exams=this.data.exams.filter(e=>e.id!==id); this.save(); this.renderAll(); } },
+
+        openLabModal(editId=null){
+            this.editingType='lab'; this.editingId=editId;
+            const existing = editId ? this.data.labs.find(l=>l.id===editId) : null;
+            this.showModal(`
+            <h3>${editId?'✏️ Edit Lab':'🔬 Schedule Lab'}</h3>
+            <div class="form-row"><div class="form-group"><label>Subject</label><input type="text" id="lfSubject" value="${existing?this.escHtml(existing.subject):''}"></div>
+            <div class="form-group"><label>Lab Name</label><input type="text" id="lfLabName" value="${existing?this.escHtml(existing.labName):''}"></div></div>
+            <div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="lfDate" value="${existing?existing.date:this.todayStr()}"></div>
+            <div class="form-group"><label>Time</label><input type="time" id="lfTime" value="${existing?existing.time:'13:00'}"></div></div>
+            <div class="form-row"><div class="form-group"><label>Location</label><input type="text" id="lfLocation" value="${existing?this.escHtml(existing.location||''):''}"></div>
+            <div class="form-group"><label>Status</label><select id="lfStatus"><option value="upcoming" ${existing&&existing.status==='upcoming'?'selected':''}>🔵 Upcoming</option><option value="completed" ${existing&&existing.status==='completed'?'selected':''}>🟢 Completed</option><option value="cancelled" ${existing&&existing.status==='cancelled'?'selected':''}>⚪ Cancelled</option></select></div></div>
+            <div class="form-group"><label>Notes</label><textarea id="lfNotes">${existing?this.escHtml(existing.notes||''):''}</textarea></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="App.closeModal()">Cancel</button><button class="btn btn-primary" onclick="App.saveLab()">${editId?'Update':'Schedule'}</button></div>
+            `);
+        },
+        saveLab(){
+            const s=document.getElementById('lfSubject')?.value.trim(), n=document.getElementById('lfLabName')?.value.trim(), d=document.getElementById('lfDate')?.value, t=document.getElementById('lfTime')?.value, l=document.getElementById('lfLocation')?.value.trim(), st=document.getElementById('lfStatus')?.value, nt=document.getElementById('lfNotes')?.value.trim();
+            if(!s||!n||!d){ this.showToast('⚠️ Fill required fields'); return; }
+            if(this.editingId){
+                const idx=this.data.labs.findIndex(lb=>lb.id===this.editingId);
+                if(idx>=0) Object.assign(this.data.labs[idx],{subject:s,labName:n,date:d,time:t,location:l,status:st,notes:nt});
+            }else{ this.data.labs.push({id:this.genId(),subject:s,labName:n,date:d,time:t,location:l,status:st,notes:nt,createdAt:Date.now()}); }
+            this.save(); this.closeModal(); this.renderAll(); this.showToast('✅ Lab saved');
+        },
+        deleteLab(id){ if(confirm('Delete?')){ this.data.labs=this.data.labs.filter(lb=>lb.id!==id); this.save(); this.renderAll(); } },
+
+        showModal(html){
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        },
+        closeModal(){
+            document.getElementById('modalOverlay').style.display = 'none';
+            this.editingId=null; this.editingType=null;
+        },
+        bindModalClose(){
+            document.getElementById('modalOverlay').addEventListener('click',(e)=>{ if(e.target===document.getElementById('modalOverlay')) this.closeModal(); });
+            document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') this.closeModal(); });
+        },
+        escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    };
+    window.App = App;
+    document.addEventListener('DOMContentLoaded',()=>App.init());
+})();
+</script>
+</body>
+</html>
